@@ -1,0 +1,51 @@
+---
+- name: ensure psad is at the latest version
+  apt: pkg=psad state=latest update_cache=yes
+  notify:
+  - restart psad
+  tags:
+    - psad
+    - packages
+
+- name: ensuring psad configuration file is in correct state.
+  template:
+    dest=/etc/psad/psad.conf
+    src=psad.conf.j2
+    owner=root
+    mode=0644
+  notify:
+  - restart psad
+  tags:
+    - psad
+    - files
+
+- shell: iptables -A INPUT -j LOG
+  notify:
+  - restart psad
+  tags:
+    - psad
+    - command
+
+- shell: iptables -A FORWARD -j LOG
+  notify:
+  - restart psad
+  tags:
+    - psad
+    - command
+
+- shell: ip6tables -A INPUT -j LOG
+  notify:
+  - restart psad
+  tags:
+    - psad
+    - command
+
+- shell: ip6tables -A FORWARD -j LOG
+  notify:
+  - restart psad
+  tags:
+    - psad
+    - command
+
+# REFERENCES:
+# Ubuntu step 13 hardening from http://www.thefanclub.co.za/how-to/how-secure-ubuntu-1204-lts-server-part-1-basics
